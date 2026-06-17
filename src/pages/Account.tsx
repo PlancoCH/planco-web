@@ -88,12 +88,9 @@ export default function Account() {
 
   return (
     <div className="max-w-6xl mx-auto px-6">
-      <section className="py-24">
+      <section className="py-12">
         <div className="max-w-lg mx-auto">
           <div className="text-center mb-12">
-            <span className="text-xs font-semibold uppercase tracking-widest text-forest-DEFAULT bg-forest-DEFAULT/10 px-4 py-1.5 rounded-full inline-block mb-8">
-              Settings
-            </span>
             <h1 className="font-serif text-5xl md:text-6xl text-forest-800 leading-tight mb-6">
               Your Account
             </h1>
