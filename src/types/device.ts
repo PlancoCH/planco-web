@@ -8,3 +8,10 @@ export interface Device {
   created_at: string;
   updated_at: string;
 }
+
+export interface DeviceUpdatePayload {
+  name?: string;
+  notes?: string | null;
+  polling_rate?: number;
+  led_enabled?: boolean;
+}
