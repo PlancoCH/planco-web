@@ -60,7 +60,7 @@ export default function Devices() {
 
   const actions: ListAction[] = [
     {
-      label: 'Map Device',
+      label: 'Add Device',
       onClick: () => {
         window.alert('Map device dialog would open here.');
       },
