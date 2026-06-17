@@ -1,11 +1,12 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Loader2, Trash2, Cpu } from 'lucide-react';
+import { Loader2, Trash2 } from 'lucide-react';
 import { getDevice, updateDevice, unmapDevice } from '../../api/devices';
 import { ApiError } from '../../api/client';
 import PageContainer from '../../components/ui/PageContainer';
 import PageTitle from '../../components/ui/PageTitle';
 import type { Device, DeviceUpdatePayload } from '../../types/device';
+import BackButton from '../../components/ui/BackButton';
 
 const POLLING_RATE_OPTIONS = [15, 30, 60, 120, 300, 600, 1800, 3600] as const;
 
@@ -140,14 +141,10 @@ export default function EditDevice() {
       <PageContainer>
         <PageTitle title="Device Not Found" subtitle="The device you're looking for doesn't exist or you don't have access." />
         <div className="flex justify-center">
-          <button
-            type="button"
-            onClick={() => navigate('/devices')}
-            className="inline-flex items-center gap-2 text-forest-600 font-medium px-5 py-2.5 rounded-full border border-forest-300 hover:border-forest-DEFAULT hover:text-forest-DEFAULT transition-all duration-300"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Devices
-          </button>
+            <BackButton
+                to="/devices"
+                text="Back to Devices"
+            />
         </div>
       </PageContainer>
     );
@@ -155,14 +152,10 @@ export default function EditDevice() {
 
   return (
     <PageContainer>
-      <button
-        type="button"
-        onClick={() => navigate('/devices')}
-        className="inline-flex items-center gap-2 text-forest-500 hover:text-forest-700 text-sm mb-6 transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back to Devices
-      </button>
+      <BackButton
+        to="/devices"
+        text="Back to Devices"
+      />
 
       <PageTitle title={device.name} subtitle="View and edit device settings." />
 

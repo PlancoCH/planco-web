@@ -6,6 +6,7 @@ import { mapDevice } from "../../api/devices";
 import { ApiError } from "../../api/client";
 import PageContainer from "../../components/ui/PageContainer";
 import PageTitle from "../../components/ui/PageTitle";
+import BackButton from "../../components/ui/BackButton";
 
 export default function AddDevice() {
   const navigate = useNavigate();
@@ -93,17 +94,10 @@ export default function AddDevice() {
 
   return (
     <PageContainer>
-      <button
-        type="button"
-        onClick={() => navigate("/devices")}
-        className="inline-flex items-center gap-2 text-forest-500 hover:text-forest-700 text-sm mb-6 transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back to Devices
-      </button>
+      <BackButton to="/devices" text="Back to Devices" />
 
       <PageTitle
-        title="Map a Device"
+        title="Add a Device"
         subtitle="Scan the QR code from your device packaging or enter the mapping key manually."
       />
 
