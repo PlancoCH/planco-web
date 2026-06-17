@@ -25,6 +25,7 @@ function filterItems<T>(
   fields: (keyof T)[],
   fuzzy: boolean,
 ): T[] {
+  if (!Array.isArray(items)) return [];
   if (!query) return items;
   const matcher = fuzzy ? fuzzyMatch : exactMatch;
   return items.filter((item) =>
@@ -33,6 +34,7 @@ function filterItems<T>(
 }
 
 function paginateItems<T>(items: T[], page: number, perPage: number): T[] {
+  if (!Array.isArray(items)) return [];
   const start = (page - 1) * perPage;
   return items.slice(start, start + perPage);
 }
