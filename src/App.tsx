@@ -5,6 +5,8 @@ import Login from './pages/Login';
 import Account from './pages/Account';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
+import Devices from './pages/Devices';
+import Plants from './pages/Plants';
 
 function AppShell() {
   const { user, loading } = useAuth();
@@ -30,6 +32,8 @@ function AppShell() {
       <main className="pt-16 pb-16">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/devices" element={<Devices />} />
+          <Route path="/plants" element={<Plants />} />
           <Route path="/account" element={<Account />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

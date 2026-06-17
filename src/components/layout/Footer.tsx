@@ -9,6 +9,8 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { path: '/', icon: Home, label: 'Home' },
+  { path: '/devices', icon: Home, label: 'Devices' },
+  { path: '/plants', icon: Home, label: 'Plants' },
 ];
 
 export default function Footer() {
