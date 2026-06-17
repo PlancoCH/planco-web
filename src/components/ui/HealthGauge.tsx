@@ -46,7 +46,7 @@ export default function HealthGauge({
   const r = size / 2 - strokeWidth - 4;
 
   const normalized = score !== null ? Math.max(0, Math.min(100, score)) : 0;
-  const fillAngle = ARC_START + (normalized / 10) * ARC_SWEEP;
+  const fillAngle = ARC_START + (normalized / 100) * ARC_SWEEP;
 
   const trackPath = describeArc(cx, cy, r, ARC_START, ARC_START + ARC_SWEEP);
   const fillPath = describeArc(cx, cy, r, ARC_START, fillAngle);
