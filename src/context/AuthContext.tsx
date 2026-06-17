@@ -14,6 +14,7 @@ interface AuthContextValue extends AuthState {
   signup: (name: string, email: string, password: string, passwordConfirmation: string) => Promise<void>;
   logout: () => Promise<void>;
   resendVerificationEmail: (email: string) => Promise<void>;
+  setUser: (user: User) => void;
   clearError: () => void;
 }
 
@@ -83,6 +84,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await resendVerification(email);
   }, []);
 
+  const setUser = useCallback((user: User) => {
+    setState((prev) => ({ ...prev, user }));
+  }, []);
+
   const clearError = useCallback(() => {
     setState((prev) => ({ ...prev, error: null }));
   }, []);
@@ -95,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signup,
         logout,
         resendVerificationEmail,
+        setUser,
         clearError,
       }}
     >

@@ -15,3 +15,15 @@ export interface AuthResponse {
 export interface MessageResponse {
   message: string;
 }
+
+export interface AccountUpdatePayload {
+  name?: string;
+  email?: string;
+  password?: string;
+  password_confirmation?: string;
+}
+
+export interface AccountUpdateResponse {
+  message: string;
+  user: User;
+}
