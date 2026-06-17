@@ -1,0 +1,38 @@
+export interface PlantType {
+  id: number;
+  common_name: string;
+  description: string | null;
+  scientific_name: string;
+  ideal_temp: number | null;
+  ideal_moisture: number | null;
+  ideal_light_lux: number | null;
+  ideal_humidity: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PlantDevice {
+  id: number;
+  name: string;
+  notes: string | null;
+  polling_rate: number;
+  wifi_rssi: number | null;
+  led_enabled: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Plant {
+  id: number;
+  device_id: number | null;
+  plant_type_id: number;
+  nickname: string;
+  notes: string | null;
+  custom_image: string | null;
+  sharing_token: string | null;
+  created_at: string;
+  updated_at: string;
+  plant_type: PlantType;
+  device: PlantDevice | null;
+  role: 'owner' | 'member';
+}
