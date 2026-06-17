@@ -61,9 +61,7 @@ export default function Devices() {
   const actions: ListAction[] = [
     {
       label: 'Add Device',
-      onClick: () => {
-        window.alert('Map device dialog would open here.');
-      },
+      onClick: () => navigate('/devices/add'),
       icon: <Plus className="w-4 h-4" />,
       variant: 'primary',
     },
@@ -74,9 +72,7 @@ export default function Devices() {
     description: 'Connect your first device to start monitoring your greenhouse.',
     cta: {
       label: 'Map a Device',
-      onClick: () => {
-        window.alert('Map device dialog would open here.');
-      },
+      onClick: () => navigate('/devices/add'),
     },
   };
 

@@ -9,6 +9,7 @@ import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import Devices from './pages/Devices';
 import EditDevice from './pages/devices/EditDevice';
+import AddDevice from './pages/devices/AddDevice';
 import Plants from './pages/Plants';
 import PageTransition from './components/transitions/PageTransition';
 
@@ -40,6 +41,7 @@ function AppShell() {
             <Routes location={location} key={location.pathname}>
               <Route path="/" element={<PageTransition><Home /></PageTransition>} />
               <Route path="/devices" element={<PageTransition><Devices /></PageTransition>} />
+              <Route path="/devices/add" element={<PageTransition><AddDevice /></PageTransition>} />
               <Route path="/devices/:id" element={<PageTransition><EditDevice /></PageTransition>} />
               <Route path="/plants" element={<PageTransition><Plants /></PageTransition>} />
               <Route path="/account" element={<PageTransition><Account /></PageTransition>} />

@@ -19,6 +19,13 @@ export function updateDevice(id: number, payload: DeviceUpdatePayload): Promise<
   }).then(response => response.data);
 }
 
+export function mapDevice(mappingKey: string): Promise<Device> {
+  return request<{ data: Device }>('/devices/map', {
+    method: 'POST',
+    body: JSON.stringify({ mapping_key: mappingKey }),
+  }).then(response => response.data);
+}
+
 export function unmapDevice(id: number): Promise<MessageResponse> {
   return request<MessageResponse>(`/devices/${id}/unmap`, {
     method: 'POST',
