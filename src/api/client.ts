@@ -1,4 +1,4 @@
-const BASE_URL = '/api';
+const BASE_URL = 'https://api.planco.ch/api';
 
 const getToken = (): string | null => localStorage.getItem('auth_token');
 
