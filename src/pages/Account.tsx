@@ -6,6 +6,7 @@ import { updateAccount } from "../api/account";
 import { ApiError } from "../api/client";
 import PageContainer from "../components/ui/PageContainer";
 import PageTitle from "../components/ui/PageTitle";
+import BackButton from "../components/ui/BackButton";
 
 export default function Account() {
   const { user, setUser, logout, loading } = useAuth();
@@ -93,6 +94,7 @@ export default function Account() {
 
   return (
     <PageContainer>
+      <BackButton text="leave account settings"></BackButton>
       <PageTitle
         title="Your Account"
         subtitle="Manage your profile, update your password, or sign out."
