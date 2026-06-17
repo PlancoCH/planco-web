@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { AnimatePresence } from 'framer-motion';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { DeviceProvider } from './context/DeviceContext';
+import { StatsProvider } from './context/StatsContext';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Account from './pages/Account';
@@ -34,23 +35,25 @@ function AppShell() {
 
   return (
     <DeviceProvider>
-      <div className="min-h-screen bg-beige-100">
-        <Header />
-        <main className="pt-16 pb-16 min-h-[calc(100vh-8rem)] overflow-hidden">
-          <AnimatePresence mode="wait">
-            <Routes location={location} key={location.pathname}>
-              <Route path="/" element={<PageTransition><Home /></PageTransition>} />
-              <Route path="/devices" element={<PageTransition><Devices /></PageTransition>} />
-              <Route path="/devices/add" element={<PageTransition><AddDevice /></PageTransition>} />
-              <Route path="/devices/:id" element={<PageTransition><EditDevice /></PageTransition>} />
-              <Route path="/plants" element={<PageTransition><Plants /></PageTransition>} />
-              <Route path="/account" element={<PageTransition><Account /></PageTransition>} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </AnimatePresence>
-        </main>
-        <Footer />
-      </div>
+      <StatsProvider>
+        <div className="min-h-screen bg-beige-100">
+          <Header />
+          <main className="pt-16 pb-16 min-h-[calc(100vh-8rem)] overflow-hidden">
+            <AnimatePresence mode="wait">
+              <Routes location={location} key={location.pathname}>
+                <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+                <Route path="/devices" element={<PageTransition><Devices /></PageTransition>} />
+                <Route path="/devices/add" element={<PageTransition><AddDevice /></PageTransition>} />
+                <Route path="/devices/:id" element={<PageTransition><EditDevice /></PageTransition>} />
+                <Route path="/plants" element={<PageTransition><Plants /></PageTransition>} />
+                <Route path="/account" element={<PageTransition><Account /></PageTransition>} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </AnimatePresence>
+          </main>
+          <Footer />
+        </div>
+      </StatsProvider>
     </DeviceProvider>
   );
 }

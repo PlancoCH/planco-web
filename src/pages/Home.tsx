@@ -1,65 +1,46 @@
-import { useState, useEffect, useMemo } from "react";
-import { Cpu, Bell } from "lucide-react";
-import PageContainer from "../components/ui/PageContainer";
-import StatCard from "../components/ui/StatCard";
-import HealthGauge from "../components/ui/HealthGauge";
-import DistributionBar from "../components/ui/DistributionBar";
-import { useAuth } from "../context/AuthContext";
-import { getStats } from "../api/stats";
-import type { StatsResponse } from "../types/stats";
-import PageTitle from "../components/ui/PageTitle";
+import { useEffect, useMemo } from 'react';
+import { Cpu, Bell } from 'lucide-react';
+import PageContainer from '../components/ui/PageContainer';
+import StatCard from '../components/ui/StatCard';
+import HealthGauge from '../components/ui/HealthGauge';
+import DistributionBar from '../components/ui/DistributionBar';
+import { useAuth } from '../context/AuthContext';
+import { useStats } from '../context/StatsContext';
+import PageTitle from '../components/ui/PageTitle';
 
 const GREETINGS: { sub: string }[] = [
-  { sub: "Your greenhouse is thriving." },
-  { sub: "Your plants are looking great today." },
+  { sub: 'Your greenhouse is thriving.' },
+  { sub: 'Your plants are looking great today.' },
   { sub: "Here's how your garden is doing." },
-  { sub: "Everything is growing nicely." },
-  { sub: "Your indoor jungle is flourishing." },
-  { sub: "The garden is at its best." },
+  { sub: 'Everything is growing nicely.' },
+  { sub: 'Your indoor jungle is flourishing.' },
+  { sub: 'The garden is at its best.' },
 ];
 
 function getGreeting(firstName: string) {
   const hour = new Date().getHours();
   const timeGreeting =
-    hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+    hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
   const pick = GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
   return {
-    heading: `${timeGreeting}, ${firstName || "Gardener"}!`,
+    heading: `${timeGreeting}, ${firstName || 'Gardener'}!`,
     sub: pick.sub,
   };
 }
 
 export default function Home() {
   const { user } = useAuth();
-  const [stats, setStats] = useState<StatsResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { stats, loading, error, refresh } = useStats();
 
   const greeting = useMemo(() => {
-    const name = user?.name ?? "";
-    const firstName = name.split(" ")[0];
+    const name = user?.name ?? '';
+    const firstName = name.split(' ')[0];
     return getGreeting(firstName);
   }, [user?.name]);
 
   useEffect(() => {
-    let cancelled = false;
-
-    getStats()
-      .then((data) => {
-        if (cancelled) return;
-        setStats(data);
-        setLoading(false);
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setError("Failed to load dashboard data.");
-        setLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    refresh();
+  }, [refresh]);
 
   const onlineDevices = stats?.devices.list.filter((d) => d.online).length ?? 0;
 
@@ -110,10 +91,10 @@ export default function Home() {
                 value={stats.unread_insights}
                 subtitle={
                   stats.unread_insights > 0
-                    ? "Needs attention"
-                    : "All caught up"
+                    ? 'Needs attention'
+                    : 'All caught up'
                 }
-                accent={stats.unread_insights > 0 ? "amber" : "forest"}
+                accent={stats.unread_insights > 0 ? 'amber' : 'forest'}
               />
               <StatCard
                 icon={Cpu}
