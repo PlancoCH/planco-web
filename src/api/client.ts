@@ -35,13 +35,18 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     return undefined as T;
   }
 
-  const data = await response.json();
+  let data: Record<string, unknown>;
+  try {
+    data = await response.json();
+  } catch {
+    data = {};
+  }
 
   if (!response.ok) {
     throw new ApiError(
-      data.message || `Request failed with status ${response.status}`,
+      (data.message as string) || `Request failed with status ${response.status}`,
       response.status,
-      data.errors || null,
+      (data.errors as Record<string, string[]>) || null,
     );
   }
 
