@@ -1,12 +1,19 @@
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import Logo from '../components/ui/Logo';
 import LoginForm from '../components/auth/LoginForm';
 import SignupForm from '../components/auth/SignupForm';
+import VerificationModal from '../components/auth/VerificationModal';
 
 type Mode = 'login' | 'signup';
 
 export default function Login() {
+  const { resendVerificationEmail } = useAuth();
   const [mode, setMode] = useState<Mode>('login');
+  const [modalEmail, setModalEmail] = useState<string | null>(null);
+
+  const showModal = (email: string) => setModalEmail(email);
+  const hideModal = () => setModalEmail(null);
 
   return (
     <div className="min-h-screen bg-beige-100 flex flex-col items-center justify-center px-6 py-12">
@@ -28,12 +35,26 @@ export default function Login() {
           </div>
 
           {mode === 'login' ? (
-            <LoginForm onSwitchToSignup={() => setMode('signup')} />
+            <LoginForm
+              onSwitchToSignup={() => setMode('signup')}
+              onVerificationNeeded={showModal}
+            />
           ) : (
-            <SignupForm onSwitchToLogin={() => setMode('login')} />
+            <SignupForm
+              onSwitchToLogin={() => setMode('login')}
+              onSignupSuccess={showModal}
+            />
           )}
         </div>
       </div>
+
+      {modalEmail !== null && (
+        <VerificationModal
+          email={modalEmail}
+          onResend={() => resendVerificationEmail(modalEmail)}
+          onClose={hideModal}
+        />
+      )}
     </div>
   );
 }

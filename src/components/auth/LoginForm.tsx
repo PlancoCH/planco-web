@@ -4,9 +4,10 @@ import { ApiError } from '../../api/client';
 
 interface LoginFormProps {
   onSwitchToSignup: () => void;
+  onVerificationNeeded: (email: string) => void;
 }
 
-export default function LoginForm({ onSwitchToSignup }: LoginFormProps) {
+export default function LoginForm({ onSwitchToSignup, onVerificationNeeded }: LoginFormProps) {
   const { login, loading, error, clearError } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,13 +20,15 @@ export default function LoginForm({ onSwitchToSignup }: LoginFormProps) {
     try {
       await login(email, password);
     } catch (err) {
-      if (err instanceof ApiError && err.errors) {
-        setFieldErrors(err.errors);
+      if (err instanceof ApiError) {
+        if (err.status === 403) {
+          onVerificationNeeded(email);
+        } else if (err.errors) {
+          setFieldErrors(err.errors);
+        }
       }
     }
   };
-
-  const isEmailUnverified = error === 'Email address not verified';
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -65,17 +68,9 @@ export default function LoginForm({ onSwitchToSignup }: LoginFormProps) {
         ))}
       </div>
 
-      {error && !isEmailUnverified && (
+      {error && (
         <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
           <p className="text-sm text-red-700">{error}</p>
-        </div>
-      )}
-
-      {isEmailUnverified && (
-        <div className="bg-beige-50 border border-beige-300 rounded-xl px-4 py-3">
-          <p className="text-sm text-forest-600">
-            Your email address is not yet verified. Please check your inbox for the verification link.
-          </p>
         </div>
       )}
 
@@ -97,6 +92,16 @@ export default function LoginForm({ onSwitchToSignup }: LoginFormProps) {
           Sign Up
         </button>
       </p>
+
+      {email && (
+        <button
+          type="button"
+          onClick={() => onVerificationNeeded(email)}
+          className="block mx-auto text-xs text-forest-400 hover:text-forest-DEFAULT transition-colors"
+        >
+          Didn't receive a verification email?
+        </button>
+      )}
     </form>
   );
 }
