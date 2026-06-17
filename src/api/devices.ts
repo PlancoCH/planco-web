@@ -13,10 +13,10 @@ export function getDevice(id: number): Promise<Device> {
 }
 
 export function updateDevice(id: number, payload: DeviceUpdatePayload): Promise<Device> {
-  return request<Device>(`/devices/${id}`, {
+  return request<{ data: Device }>(`/devices/${id}`, {
     method: 'PUT',
     body: JSON.stringify(payload),
-  });
+  }).then(response => response.data);
 }
 
 export function unmapDevice(id: number): Promise<MessageResponse> {
