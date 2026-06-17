@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Cpu, Plus } from 'lucide-react';
 import PageTitle from '../components/ui/PageTitle';
@@ -51,7 +52,11 @@ const paginationConfig: PaginationConfig = {
 
 export default function Devices() {
   const navigate = useNavigate();
-  const { devices, loading } = useDevices();
+  const { devices, loading, refresh } = useDevices();
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   const actions: ListAction[] = [
     {

@@ -46,7 +46,10 @@ export function DeviceProvider({ children }: { children: ReactNode }) {
     };
   });
 
-  const fetchDevices = useCallback(async () => {
+  const fetchDevices = useCallback(async (showLoading: boolean) => {
+    if (showLoading) {
+      setState((prev) => ({ ...prev, loading: true, error: null }));
+    }
     try {
       const devices = await getDevices();
       saveCache(devices);
@@ -61,12 +64,11 @@ export function DeviceProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    fetchDevices();
+    fetchDevices(true);
   }, [fetchDevices]);
 
   const refresh = useCallback(async () => {
-    setState((prev) => ({ ...prev, loading: true, error: null }));
-    await fetchDevices();
+    await fetchDevices(false);
   }, [fetchDevices]);
 
   return (
