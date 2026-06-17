@@ -45,7 +45,7 @@ export default function HealthGauge({
   const cy = size / 2;
   const r = size / 2 - strokeWidth - 4;
 
-  const normalized = score !== null ? Math.max(0, Math.min(10, score)) : 0;
+  const normalized = score !== null ? Math.max(0, Math.min(100, score)) : 0;
   const fillAngle = ARC_START + (normalized / 10) * ARC_SWEEP;
 
   const trackPath = describeArc(cx, cy, r, ARC_START, ARC_START + ARC_SWEEP);
@@ -84,7 +84,7 @@ export default function HealthGauge({
         <span className="text-2xl font-bold text-forest-800 font-serif leading-none">
           {score !== null ? score.toFixed(1) : '—'}
         </span>
-        <span className="text-xs text-forest-400 mt-0.5">/ 10</span>
+        <span className="text-xs text-forest-400 mt-0.5">/ 100</span>
       </div>
     </div>
   );
