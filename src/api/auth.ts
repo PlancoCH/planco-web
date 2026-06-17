@@ -1,5 +1,5 @@
 import { request } from './client';
-import type { User, AuthResponse, MessageResponse } from '../types/api';
+import type { User, AuthResponse, MessageResponse } from '../types/auth';
 
 interface SignupPayload {
   name: string;

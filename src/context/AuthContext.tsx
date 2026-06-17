@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { login as apiLogin, signup as apiSignup, logout as apiLogout, getMe, resendVerification } from '../api/auth';
 import { ApiError } from '../api/client';
-import type { User } from '../types/api';
+import type { User } from '../types/auth';
 
 interface AuthState {
   user: User | null;
