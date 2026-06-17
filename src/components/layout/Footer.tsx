@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home } from 'lucide-react';
+import { Home, Flower2, MonitorCog } from 'lucide-react';
 
 interface NavItem {
   path: string;
@@ -9,8 +9,9 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { path: '/', icon: Home, label: 'Home' },
-  { path: '/devices', icon: Home, label: 'Devices' },
-  { path: '/plants', icon: Home, label: 'Plants' },
+  { path: '/plants', icon: Flower2, label: 'Plants' },
+  { path: '/devices', icon: MonitorCog, label: 'Devices' },
+
 ];
 
 export default function Footer() {
