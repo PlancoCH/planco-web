@@ -22,10 +22,14 @@ export default function JoinPlant() {
 
   const startScanner = useCallback(async () => {
     setError(null);
+    setScanning(true);
+
+    // wait for React to flush the DOM update so the scanner container exists
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
     try {
       const scanner = new Html5Qrcode(scannerContainerId);
       scannerRef.current = scanner;
-      setScanning(true);
 
       await scanner.start(
         { facingMode: "environment" },
@@ -44,7 +48,7 @@ export default function JoinPlant() {
       );
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Failed to start camera.";
+        err instanceof Error ? err.message : String(err);
       setError(message);
       setScanning(false);
     }
