@@ -11,6 +11,7 @@ import {
   Bell,
   CheckCheck,
   Pencil,
+  Share,
 } from "lucide-react";
 import {
   getPlant,
@@ -164,7 +165,16 @@ export default function ViewPlant() {
     <PageContainer>
       <div className="flex items-center justify-between mb-2">
         <BackButton to="/plants" text="Back to Plants" />
+        <div>
         <button
+          type="button"
+          onClick={() => navigate(`/plants/${plantId}/share`)}
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-forest-DEFAULT hover:text-forest-700 bg-forest-DEFAULT/10 hover:bg-forest-DEFAULT/20 rounded-lg px-3 py-1.5 transition-colors mr-2"
+        >
+          <Share className="w-4 h-4" />
+          Share
+        </button>
+                <button
           type="button"
           onClick={() => navigate(`/plants/${plantId}/edit`)}
           className="inline-flex items-center gap-1.5 text-sm font-medium text-forest-DEFAULT hover:text-forest-700 bg-forest-DEFAULT/10 hover:bg-forest-DEFAULT/20 rounded-lg px-3 py-1.5 transition-colors"
@@ -172,6 +182,8 @@ export default function ViewPlant() {
           <Pencil className="w-4 h-4" />
           Edit
         </button>
+        </div>
+
       </div>
 
       {/* Hero */}

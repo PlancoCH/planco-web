@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sprout, Plus } from 'lucide-react';
+import { Sprout, Plus, UsersRound } from 'lucide-react';
 import PageTitle from '../components/ui/PageTitle';
 import PageContainer from '../components/ui/PageContainer';
 import SmartList from '../components/ui/SmartList';
@@ -41,6 +41,7 @@ export default function Plants() {
 
   const actions: ListAction[] = [
     { label: 'Add Plant', onClick: () => navigate('/plants/add'), icon: <Plus className="w-4 h-4" />, variant: 'primary' },
+    { label: 'Join a plant', onClick: () => navigate('/plants/join'), icon: <UsersRound className="w-4 h-4" />, variant: 'secondary' },
   ];
 
   return (
