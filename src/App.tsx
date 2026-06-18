@@ -18,6 +18,8 @@ import ViewPlant from './pages/plants/ViewPlant';
 import EditPlant from './pages/plants/EditPlant';
 import AddPlant from './pages/plants/AddPlant';
 import PageTransition from './components/transitions/PageTransition';
+import JoinPlant from './pages/plants/JoinPlant';
+import SharePlant from './pages/plants/SharePlant';
 
 function AppShell() {
   const { user, loading } = useAuth();
@@ -56,6 +58,8 @@ function AppShell() {
                     <Route path="/plants/add" element={<PageTransition><AddPlant /></PageTransition>} />
                     <Route path="/plants/:id/edit" element={<PageTransition><EditPlant /></PageTransition>} />
                     <Route path="/plants/:id" element={<PageTransition><ViewPlant /></PageTransition>} />
+                    <Route path="/plants/:id/share" element={<PageTransition><SharePlant /></PageTransition>} />
+                    <Route path="/plants/join" element={<PageTransition><JoinPlant /></PageTransition>} />
                     <Route path="/account" element={<PageTransition><Account /></PageTransition>} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>

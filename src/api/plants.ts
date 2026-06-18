@@ -1,5 +1,5 @@
 import { request } from './client';
-import type { Plant, PlantData, DailyInsight, PlantDataQuery, PlantUpdatePayload, PlantCreatePayload, PaginatedPlantTypes } from '../types/plant';
+import type { Plant, PlantData, DailyInsight, PlantDataQuery, PlantUpdatePayload, PlantCreatePayload, PaginatedPlantTypes, ShareTokenResponse } from '../types/plant';
 import type { MessageResponse } from '../types/auth';
 
 export function getPlants(): Promise<Plant[]> {
@@ -71,5 +71,18 @@ export function createPlant(payload: PlantCreatePayload): Promise<Plant> {
   return request<{ data: Plant }>('/plants', {
     method: 'POST',
     body: JSON.stringify(payload),
+  }).then(response => response.data);
+}
+
+export function getShareToken(plantId: number): Promise<ShareTokenResponse> {
+  return request<ShareTokenResponse>(`/plants/${plantId}/share`, {
+    method: 'POST',
+  });
+}
+
+export function joinPlant(sharingToken: string): Promise<Plant> {
+  return request<{ data: Plant }>('/plants/join', {
+    method: 'POST',
+    body: JSON.stringify({ sharing_token: sharingToken }),
   }).then(response => response.data);
 }

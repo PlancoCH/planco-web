@@ -96,3 +96,11 @@ export interface PlantDataQuery {
   start_date?: string;
   end_date?: string;
 }
+
+export interface ShareTokenResponse {
+  sharing_token: string;
+}
+
+export interface JoinPlantPayload {
+  sharing_token: string;
+}
