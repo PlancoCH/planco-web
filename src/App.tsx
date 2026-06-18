@@ -16,6 +16,7 @@ import AddDevice from './pages/devices/AddDevice';
 import Plants from './pages/Plants';
 import ViewPlant from './pages/plants/ViewPlant';
 import EditPlant from './pages/plants/EditPlant';
+import AddPlant from './pages/plants/AddPlant';
 import PageTransition from './components/transitions/PageTransition';
 
 function AppShell() {
@@ -52,6 +53,7 @@ function AppShell() {
                     <Route path="/devices/add" element={<PageTransition><AddDevice /></PageTransition>} />
                     <Route path="/devices/:id" element={<PageTransition><EditDevice /></PageTransition>} />
                     <Route path="/plants" element={<PageTransition><Plants /></PageTransition>} />
+                    <Route path="/plants/add" element={<PageTransition><AddPlant /></PageTransition>} />
                     <Route path="/plants/:id/edit" element={<PageTransition><EditPlant /></PageTransition>} />
                     <Route path="/plants/:id" element={<PageTransition><ViewPlant /></PageTransition>} />
                     <Route path="/account" element={<PageTransition><Account /></PageTransition>} />

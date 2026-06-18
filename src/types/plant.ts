@@ -60,11 +60,36 @@ export interface DailyInsight {
   updated_at: string;
 }
 
+export interface PlantCreatePayload {
+  nickname: string;
+  notes?: string;
+  plant_type_id: number;
+  custom_image?: string;
+}
+
 export interface PlantUpdatePayload {
   nickname?: string;
   notes?: string | null;
   plant_type_id?: number;
   custom_image?: string;
+}
+
+export interface PaginatedPlantTypes {
+  data: PlantType[];
+  links: {
+    first: string | null;
+    last: string | null;
+    prev: string | null;
+    next: string | null;
+  };
+  meta: {
+    current_page: number;
+    from: number;
+    last_page: number;
+    per_page: number;
+    to: number;
+    total: number;
+  };
 }
 
 export interface PlantDataQuery {

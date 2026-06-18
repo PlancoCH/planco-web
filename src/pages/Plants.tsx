@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sprout } from 'lucide-react';
+import { Sprout, Plus } from 'lucide-react';
 import PageTitle from '../components/ui/PageTitle';
 import PageContainer from '../components/ui/PageContainer';
 import SmartList from '../components/ui/SmartList';
-import type { SearchConfig, PaginationConfig, EmptyStateConfig } from '../components/ui/SmartList';
+import type { SearchConfig, PaginationConfig, ListAction, EmptyStateConfig } from '../components/ui/SmartList';
 import ImageCard from '../components/ui/ImageCard';
 import type { Plant } from '../types/plant';
 import { usePlants } from '../context/PlantContext';
@@ -34,9 +34,14 @@ export default function Plants() {
   const emptyState: EmptyStateConfig = {
     message: 'No plants yet',
     description: 'Get started by adding your first plant to begin tracking its health.',
+    cta: { label: 'Add a Plant', onClick: () => navigate('/plants/add') },
   };
 
   const navigate = useNavigate();
+
+  const actions: ListAction[] = [
+    { label: 'Add Plant', onClick: () => navigate('/plants/add'), icon: <Plus className="w-4 h-4" />, variant: 'primary' },
+  ];
 
   return (
     <PageContainer>
@@ -59,6 +64,7 @@ export default function Plants() {
           displayMode="small"
           search={searchConfig}
           pagination={paginationConfig}
+          actions={actions}
           emptyState={emptyState}
           renderItem={(plant) => (
             <ImageCard

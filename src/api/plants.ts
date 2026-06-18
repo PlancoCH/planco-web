@@ -1,5 +1,5 @@
 import { request } from './client';
-import type { Plant, PlantData, DailyInsight, PlantDataQuery, PlantUpdatePayload } from '../types/plant';
+import type { Plant, PlantData, DailyInsight, PlantDataQuery, PlantUpdatePayload, PlantCreatePayload, PaginatedPlantTypes } from '../types/plant';
 import type { MessageResponse } from '../types/auth';
 
 export function getPlants(): Promise<Plant[]> {
@@ -57,4 +57,19 @@ export function unmapPlantDevice(plantId: number): Promise<MessageResponse> {
   return request<MessageResponse>(`/plants/${plantId}/unmap`, {
     method: 'POST',
   });
+}
+
+export function getPlantTypes(search?: string, page?: number): Promise<PaginatedPlantTypes> {
+  const params = new URLSearchParams();
+  if (search) params.append('search', search);
+  if (page && page > 1) params.append('page', String(page));
+  const qs = params.toString();
+  return request<PaginatedPlantTypes>(`/plant-types${qs ? `?${qs}` : ''}`);
+}
+
+export function createPlant(payload: PlantCreatePayload): Promise<Plant> {
+  return request<{ data: Plant }>('/plants', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  }).then(response => response.data);
 }
