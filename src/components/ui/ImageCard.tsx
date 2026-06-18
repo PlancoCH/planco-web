@@ -11,6 +11,7 @@ interface ImageCardProps {
   paragraph: string;
   tags?: string[];
   reverse?: boolean;
+  onClick?: () => void;
 }
 
 export default function ImageCard({
@@ -22,15 +23,22 @@ export default function ImageCard({
   paragraph,
   tags,
   reverse = false,
+  onClick,
 }: ImageCardProps) {
   const isHorizontal = variant === 'horizontal';
+  const isClickable = onClick !== undefined;
 
   return (
     <div
-      className={`group overflow-hidden border border-beige-300 bg-beige-50 hover:border-forest-300 hover:shadow-lg hover:shadow-forest-DEFAULT/10 transition-all duration-300 ${
+      onClick={onClick}
+      className={`group overflow-hidden border border-beige-300 bg-beige-50 transition-all duration-300 ${
         isHorizontal
           ? 'grid md:grid-cols-5 rounded-3xl hover:shadow-xl'
           : 'rounded-2xl'
+      } ${
+        isClickable
+          ? 'cursor-pointer hover:border-forest-300 hover:shadow-lg hover:shadow-forest-DEFAULT/10'
+          : 'hover:border-forest-300 hover:shadow-lg hover:shadow-forest-DEFAULT/10'
       }`}
     >
       {/* Image */}

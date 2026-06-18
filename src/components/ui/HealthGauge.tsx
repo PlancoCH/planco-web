@@ -9,8 +9,8 @@ const ARC_START = 135;
 const ARC_SWEEP = 270;
 
 function scoreToColor(score: number): string {
-  if (score >= 7) return '#1A5C32'; // forest-DEFAULT
-  if (score >= 4) return '#D97706'; // amber-600
+  if (score >= 70) return '#1A5C32'; // forest-DEFAULT
+  if (score >= 40) return '#D97706'; // amber-600
   return '#DC2626'; // red-600
 }
 
