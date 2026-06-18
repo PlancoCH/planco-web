@@ -165,6 +165,7 @@ export default function ViewPlant() {
     <PageContainer>
       <div className="flex items-center justify-between mb-2">
         <BackButton to="/plants" text="Back to Plants" />
+        {plant.role === "owner" && (
         <div>
         <button
           type="button"
@@ -183,7 +184,7 @@ export default function ViewPlant() {
           Edit
         </button>
         </div>
-
+)}
       </div>
 
       {/* Hero */}
