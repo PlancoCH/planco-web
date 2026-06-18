@@ -1,5 +1,6 @@
 import { request } from './client';
-import type { Plant, PlantData, DailyInsight, PlantDataQuery } from '../types/plant';
+import type { Plant, PlantData, DailyInsight, PlantDataQuery, PlantUpdatePayload } from '../types/plant';
+import type { MessageResponse } from '../types/auth';
 
 export function getPlants(): Promise<Plant[]> {
   return request<{ data: Plant[] }>('/plants')
@@ -30,4 +31,17 @@ export function markInsightAsRead(plantId: number, insightId: number): Promise<D
     `/plants/${plantId}/insights/${insightId}/read`,
     { method: 'PATCH' },
   ).then(response => response.data);
+}
+
+export function updatePlant(id: number, payload: PlantUpdatePayload): Promise<Plant> {
+  return request<{ data: Plant }>(`/plants/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  }).then(response => response.data);
+}
+
+export function deletePlant(id: number): Promise<MessageResponse> {
+  return request<MessageResponse>(`/plants/${id}`, {
+    method: 'DELETE',
+  });
 }

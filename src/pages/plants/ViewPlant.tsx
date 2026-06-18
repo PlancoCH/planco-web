@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Sprout,
   Thermometer,
@@ -10,6 +10,7 @@ import {
   Cpu,
   Bell,
   CheckCheck,
+  Pencil,
 } from "lucide-react";
 import {
   getPlant,
@@ -46,6 +47,7 @@ function formatInsightTime(iso: string): string {
 
 export default function ViewPlant() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const plantId = Number(id);
   const { getImageUrl } = useImageCache();
 
@@ -160,7 +162,17 @@ export default function ViewPlant() {
 
   return (
     <PageContainer>
-      <BackButton to="/plants" text="Back to Plants" />
+      <div className="flex items-center justify-between mb-2">
+        <BackButton to="/plants" text="Back to Plants" />
+        <button
+          type="button"
+          onClick={() => navigate(`/plants/${plantId}/edit`)}
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-forest-DEFAULT hover:text-forest-700 bg-forest-DEFAULT/10 hover:bg-forest-DEFAULT/20 rounded-lg px-3 py-1.5 transition-colors"
+        >
+          <Pencil className="w-4 h-4" />
+          Edit
+        </button>
+      </div>
 
       {/* Hero */}
       <div className="mb-8">

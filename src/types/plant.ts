@@ -60,6 +60,13 @@ export interface DailyInsight {
   updated_at: string;
 }
 
+export interface PlantUpdatePayload {
+  nickname?: string;
+  notes?: string | null;
+  plant_type_id?: number;
+  custom_image?: string;
+}
+
 export interface PlantDataQuery {
   start_date?: string;
   end_date?: string;
