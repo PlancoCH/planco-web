@@ -74,20 +74,22 @@ export default function SharePlant() {
 
       <div className="bg-beige-50 rounded-2xl border border-beige-300 p-8 shadow-sm">
         {sharingToken ? (
-          <div className="flex flex-col items-center">
+          <div>
             <h2 className="font-serif text-xl text-forest-800 mb-6">
               Plant Sharing Code
             </h2>
 
-            <div className="bg-white rounded-xl border border-beige-300 p-4 mb-6 inline-block">
-              <canvas ref={canvasRef} />
+            <div className="flex justify-center mb-6">
+              <div className="bg-white rounded-xl border border-beige-300 p-4 inline-block">
+                <canvas ref={canvasRef} />
+              </div>
             </div>
 
-            <div className="w-full max-w-md mb-6">
-              <p className="text-xs text-forest-400 uppercase tracking-wide mb-2 text-center">
+            <div className="mb-6">
+              <p className="text-xs text-forest-400 uppercase tracking-wide mb-2">
                 Sharing Token
               </p>
-              <div className="flex gap-2">
+              <div className="flex gap-2 max-w-md">
                 <div className="flex-1 bg-white border border-beige-300 rounded-xl px-4 py-3 font-mono text-sm text-forest-700 truncate select-all">
                   {sharingToken}
                 </div>
@@ -111,20 +113,17 @@ export default function SharePlant() {
               </div>
             </div>
 
-            <p className="text-sm text-forest-500 text-center max-w-sm">
+            <p className="text-sm text-forest-500">
               Share this code or have the other user scan the QR code from the{" "}
               <strong>Join Plant</strong> page.
             </p>
           </div>
         ) : (
-          <div className="flex flex-col items-center py-8">
-            <div className="w-16 h-16 rounded-full bg-forest-DEFAULT/10 flex items-center justify-center mb-4">
-              <Share className="w-8 h-8 text-forest-DEFAULT" />
-            </div>
+          <div>
             <h2 className="font-serif text-xl text-forest-800 mb-2">
               Generate Sharing Link
             </h2>
-            <p className="text-forest-500 text-sm mb-6 text-center max-w-sm">
+            <p className="text-forest-500 text-sm mb-6">
               Create a unique sharing token that another user can use to join
               this plant.
             </p>
