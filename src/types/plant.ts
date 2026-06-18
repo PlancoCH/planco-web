@@ -50,6 +50,16 @@ export interface PlantData {
   updated_at: string;
 }
 
+export interface DailyInsight {
+  id: number;
+  plant_id: number;
+  insight_type: string;
+  message: string;
+  is_read: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface PlantDataQuery {
   start_date?: string;
   end_date?: string;

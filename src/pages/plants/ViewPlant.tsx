@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Sprout, Thermometer, Droplets, Sun, Gauge, Leaf, Cpu } from 'lucide-react';
-import { getPlant, getPlantData } from '../../api/plants';
+import { Sprout, Thermometer, Droplets, Sun, Gauge, Leaf, Cpu, Bell, CheckCheck } from 'lucide-react';
+import { getPlant, getPlantData, getPlantInsights, markInsightAsRead } from '../../api/plants';
 import { ApiError } from '../../api/client';
 import PageContainer from '../../components/ui/PageContainer';
 import PageTitle from '../../components/ui/PageTitle';
@@ -13,11 +13,18 @@ import SensorTimeChart from '../../components/ui/SensorTimeChart';
 import CollapsibleSection from '../../components/ui/CollapsibleSection';
 import { useAuthImage } from '../../hooks/useAuthImage';
 import { useImageCache } from '../../context/ImageCacheContext';
-import type { Plant, PlantData } from '../../types/plant';
+import type { Plant, PlantData, DailyInsight } from '../../types/plant';
 
 function getAuthHeaders(): HeadersInit {
   const token = localStorage.getItem('auth_token');
   return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+function formatInsightTime(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-CH', { day: 'numeric', month: 'short' }) +
+    ' ' +
+    d.toLocaleTimeString('en-CH', { hour: '2-digit', minute: '2-digit' });
 }
 
 export default function ViewPlant() {
@@ -27,8 +34,10 @@ export default function ViewPlant() {
 
   const [plant, setPlant] = useState<Plant | null>(null);
   const [plantData, setPlantData] = useState<PlantData[] | null>(null);
+  const [insights, setInsights] = useState<DailyInsight[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [markingRead, setMarkingRead] = useState<number | null>(null);
 
   const cachedImage = getImageUrl('plant', plantId);
   const imageUrl = cachedImage ?? `https://api.planco.ch/api/plants/${plantId}/image`;
@@ -51,11 +60,13 @@ export default function ViewPlant() {
     Promise.all([
       getPlant(plantId),
       getPlantData(plantId).catch(() => [] as PlantData[]),
+      getPlantInsights(plantId).catch(() => [] as DailyInsight[]),
     ])
-      .then(([plantResult, dataResult]) => {
+      .then(([plantResult, dataResult, insightsResult]) => {
         if (cancelled) return;
         setPlant(plantResult);
         setPlantData(dataResult);
+        setInsights(insightsResult);
         setLoading(false);
       })
       .catch((err) => {
@@ -98,6 +109,24 @@ export default function ViewPlant() {
     : null;
 
   const latestScore = latestData?.plant_score ?? null;
+
+  const handleMarkRead = (insightId: number) => {
+    setMarkingRead(insightId);
+    markInsightAsRead(plantId, insightId)
+      .then((updated) => {
+        setInsights((prev) =>
+          (prev ?? []).map((i) => (i.id === insightId ? updated : i)),
+        );
+      })
+      .catch(() => {})
+      .finally(() => setMarkingRead(null));
+  };
+
+  const unreadCount = insights ? insights.filter((i) => !i.is_read).length : 0;
+
+  const sortedInsights = insights
+    ? [...insights].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    : [];
 
   return (
     <PageContainer>
@@ -247,6 +276,61 @@ export default function ViewPlant() {
                   <p className="text-sm text-forest-600 leading-relaxed">{plant.device.notes}</p>
                 </div>
               )}
+            </div>
+          </CollapsibleSection>
+        )}
+
+        {insights && insights.length > 0 && (
+          <CollapsibleSection
+            title={`Daily Insights${unreadCount > 0 ? ` (${unreadCount})` : ''}`}
+            icon={Bell}
+          >
+            <div className="space-y-3">
+              {sortedInsights.map((insight) => (
+                <div
+                  key={insight.id}
+                  className={`rounded-xl border p-4 ${
+                    insight.is_read
+                      ? 'border-beige-200 bg-beige-50/70'
+                      : 'border-forest-200 bg-forest-DEFAULT/5'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-forest-500 bg-beige-200 rounded-full px-2 py-0.5">
+                          {insight.insight_type.replace(/_/g, ' ')}
+                        </span>
+                        {!insight.is_read && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-forest-DEFAULT shrink-0" />
+                        )}
+                      </div>
+                      <p className="text-sm text-forest-700 leading-relaxed">{insight.message}</p>
+                      <p className="text-[11px] text-forest-400 mt-2">{formatInsightTime(insight.created_at)}</p>
+                    </div>
+                    {!insight.is_read && (
+                      <button
+                        type="button"
+                        onClick={() => handleMarkRead(insight.id)}
+                        disabled={markingRead === insight.id}
+                        className="shrink-0 inline-flex items-center gap-1.5 text-xs font-medium text-forest-DEFAULT hover:text-forest-700 bg-forest-DEFAULT/10 hover:bg-forest-DEFAULT/20 rounded-lg px-3 py-1.5 transition-colors disabled:opacity-50"
+                      >
+                        {markingRead === insight.id ? (
+                          <>
+                            <div className="w-3 h-3 border-1.5 border-forest-DEFAULT border-t-transparent rounded-full animate-spin" />
+                            Marking...
+                          </>
+                        ) : (
+                          <>
+                            <CheckCheck className="w-3.5 h-3.5" />
+                            Mark read
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </CollapsibleSection>
         )}

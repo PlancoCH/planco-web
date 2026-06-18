@@ -1,5 +1,5 @@
 import { request } from './client';
-import type { Plant, PlantData, PlantDataQuery } from '../types/plant';
+import type { Plant, PlantData, DailyInsight, PlantDataQuery } from '../types/plant';
 
 export function getPlants(): Promise<Plant[]> {
   return request<{ data: Plant[] }>('/plants')
@@ -19,4 +19,15 @@ export function getPlantData(id: number, query?: PlantDataQuery): Promise<PlantD
   const endpoint = qs ? `/plants/${id}/data?${qs}` : `/plants/${id}/data`;
   return request< { data: PlantData[] } >(endpoint)
   .then(response => response.data);
+}
+
+export function getPlantInsights(plantId: number): Promise<DailyInsight[]> {
+  return request<{ data: DailyInsight[] }>(`/plants/${plantId}/insights`).then(response => response.data);
+}
+
+export function markInsightAsRead(plantId: number, insightId: number): Promise<DailyInsight> {
+  return request<{ message: string; data: DailyInsight }>(
+    `/plants/${plantId}/insights/${insightId}/read`,
+    { method: 'PATCH' },
+  ).then(response => response.data);
 }
