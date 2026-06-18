@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  Sprout,
   Thermometer,
   Droplets,
   Sun,
@@ -12,6 +11,7 @@ import {
   CheckCheck,
   Pencil,
   Share,
+  ArrowLeft,
 } from "lucide-react";
 import {
   getPlant,
@@ -23,7 +23,6 @@ import { ApiError } from "../../api/client";
 import PageContainer from "../../components/ui/PageContainer";
 import PageTitle from "../../components/ui/PageTitle";
 import BackButton from "../../components/ui/BackButton";
-import ImageCard from "../../components/ui/ImageCard";
 import HealthGauge from "../../components/ui/HealthGauge";
 import StatCard from "../../components/ui/StatCard";
 import SensorTimeChart from "../../components/ui/SensorTimeChart";
@@ -163,49 +162,69 @@ export default function ViewPlant() {
 
   return (
     <PageContainer>
-      <div className="flex items-center justify-between mb-2">
-        <BackButton to="/plants" text="Back to Plants" />
-        {plant.role === "owner" && (
-        <div>
-        <button
-          type="button"
-          onClick={() => navigate(`/plants/${plantId}/share`)}
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-forest-DEFAULT hover:text-forest-700 bg-forest-DEFAULT/10 hover:bg-forest-DEFAULT/20 rounded-lg px-3 py-1.5 transition-colors mr-2"
-        >
-          <Share className="w-4 h-4" />
-          Share
-        </button>
-                <button
-          type="button"
-          onClick={() => navigate(`/plants/${plantId}/edit`)}
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-forest-DEFAULT hover:text-forest-700 bg-forest-DEFAULT/10 hover:bg-forest-DEFAULT/20 rounded-lg px-3 py-1.5 transition-colors"
-        >
-          <Pencil className="w-4 h-4" />
-          Edit
-        </button>
-        </div>
-)}
-      </div>
-
       {/* Hero */}
-      <div className="mb-8">
-        <ImageCard
-          variant="horizontal"
-          icon={Sprout}
-          image={displayImage ?? imageUrl}
-          imageAlt={plant.nickname}
-          title={plant.nickname}
-          paragraph={
-            plant.notes ??
-            `A ${plant.plant_type.common_name} (${plant.plant_type.scientific_name})`
-          }
-          tags={[
-            plant.role === "owner" ? "Owner" : "Member",
-            plant.device
-              ? `Connected to ${plant.device.name}`
-              : "No device connected",
-          ]}
-        />
+      <div className="relative -mx-6 -mt-8 mb-8">
+        <div className="relative h-[420px] md:h-[500px] overflow-hidden">
+          <img
+            src={displayImage ?? imageUrl}
+            alt={plant.nickname}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-beige-100" />
+        </div>
+
+        {/* Top bar */}
+        <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 sm:px-6 py-4">
+          <button
+            type="button"
+            onClick={() => navigate("/plants")}
+            className="inline-flex items-center gap-2 text-white/90 hover:text-white text-sm transition-colors drop-shadow-sm"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Plants
+          </button>
+          {plant.role === "owner" && (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => navigate(`/plants/${plantId}/share`)}
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-white bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg px-3 py-1.5 transition-colors"
+              >
+                <Share className="w-4 h-4" />
+                Share
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate(`/plants/${plantId}/edit`)}
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-white bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg px-3 py-1.5 transition-colors"
+              >
+                <Pencil className="w-4 h-4" />
+                Edit
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Bottom text */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 sm:px-6 pb-8 md:pb-10">
+          <h1 className="font-serif text-3xl md:text-4xl text-white mb-3 drop-shadow-sm text-shadow-lg">
+            {plant.nickname}
+          </h1>
+          <p className="text-white/80 text-sm md:text-base max-w-xl leading-relaxed text-shadow-lg">
+            {plant.notes ??
+              `A ${plant.plant_type.common_name} (${plant.plant_type.scientific_name})`}
+          </p>
+          <div className="flex flex-wrap gap-2 mt-4">
+            <span className="text-xs font-medium text-FOREST/90 bg-white/15 backdrop-blur-sm px-3 py-1 rounded-full border border-white/20 shadow-sm">
+              {plant.role === "owner" ? "Owner" : "Member"}
+            </span>
+            <span className="text-xs font-medium text-FOREST/90 bg-white/15 backdrop-blur-sm px-3 py-1 rounded-full border border-white/20 shadow-sm">
+              {plant.device
+                ? `Connected to ${plant.device.name}`
+                : "No device connected"}
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Health Section */}
