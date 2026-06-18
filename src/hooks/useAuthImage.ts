@@ -26,6 +26,27 @@ function blobToDataUrl(blob: Blob): Promise<string> {
   });
 }
 
+export async function fetchImageAsDataUrl(url: string, fetchHeaders: HeadersInit): Promise<string> {
+  const response = await fetch(url, { headers: fetchHeaders });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+  const contentType = response.headers.get('Content-Type') || '';
+
+  if (contentType.startsWith('image/')) {
+    const blob = await response.blob();
+    return blobToDataUrl(blob);
+  }
+
+  const text = await response.text();
+
+  if (text.startsWith('data:image/')) return text;
+
+  const mime = detectImageMime(text);
+  if (mime) return `data:${mime};base64,${text.trimStart()}`;
+
+  throw new Error(`Unrecognised image format (Content-Type: ${contentType})`);
+}
+
 export function useAuthImage(url: string, fetchHeaders?: HeadersInit): { dataUrl: string | null; loading: boolean } {
   const [dataUrl, setDataUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);

@@ -23,7 +23,7 @@ const paginationConfig: PaginationConfig = {
 };
 
 export default function Plants() {
-  const { plants, loading, refresh } = usePlants();
+  const { plants, loading, refresh, imageCache } = usePlants();
   const token = getToken();
 
   useEffect(() => {
@@ -57,11 +57,14 @@ export default function Plants() {
           search={searchConfig}
           pagination={paginationConfig}
           emptyState={emptyState}
-          renderItem={(plant) => (
+          renderItem={(plant) => {
+            const cachedImage = imageCache[plant.id];
+            const imageUrl = `https://api.planco.ch/api/plants/${plant.id}/image`;
+            return (
             <ImageCard
               variant="vertical"
               icon={Sprout}
-              image={"https://api.planco.ch/api/plants/" + plant.id + "/image"}
+              image={cachedImage ?? imageUrl}
               imageAlt={plant.nickname}
               title={plant.nickname}
               paragraph={
@@ -73,9 +76,10 @@ export default function Plants() {
                 plant.role === 'owner' ? 'Owner' : 'Member',
                 plant.device ? `Connected to ${plant.device.name}` : 'No device',
               ]}
-              fetchHeaders={token ? { Authorization: `Bearer ${token}` } : undefined}
+              fetchHeaders={cachedImage ? undefined : token ? { Authorization: `Bearer ${token}` } : undefined}
             />
-          )}
+            );
+          }}
         />
       )}
     </PageContainer>
