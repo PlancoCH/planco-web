@@ -67,7 +67,7 @@ export default function EditPlant() {
 
     try {
       const updated = await updatePlant(plantId, payload);
-      setPlant(updated);
+      setPlant((prev) => (prev ? { ...updated, plant_type: prev.plant_type, device: prev.device } : updated));
       setSuccess('Plant updated successfully.');
     } catch (err) {
       if (err instanceof ApiError) {
