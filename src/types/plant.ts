@@ -36,3 +36,21 @@ export interface Plant {
   device: PlantDevice | null;
   role: 'owner' | 'member';
 }
+
+export interface PlantData {
+  id: number;
+  plant_id: number;
+  plant_score: number | null;
+  temperature: number;
+  humidity: number;
+  air_pressure: number | null;
+  light_intensity: number;
+  soil_moisture: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PlantDataQuery {
+  start_date?: string;
+  end_date?: string;
+}
