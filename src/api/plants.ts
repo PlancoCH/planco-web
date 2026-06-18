@@ -45,3 +45,16 @@ export function deletePlant(id: number): Promise<MessageResponse> {
     method: 'DELETE',
   });
 }
+
+export function mapPlantDevice(plantId: number, deviceId: number): Promise<Plant> {
+  return request<{ data: Plant }>(`/plants/${plantId}/map`, {
+    method: 'POST',
+    body: JSON.stringify({ device_id: deviceId }),
+  }).then(response => response.data);
+}
+
+export function unmapPlantDevice(plantId: number): Promise<MessageResponse> {
+  return request<MessageResponse>(`/plants/${plantId}/unmap`, {
+    method: 'POST',
+  });
+}

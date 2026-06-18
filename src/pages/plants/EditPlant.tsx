@@ -1,8 +1,10 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, useMemo, type FormEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Loader2, Trash2 } from 'lucide-react';
-import { getPlant, updatePlant, deletePlant } from '../../api/plants';
+import { Loader2, Trash2, Cpu, Plus, Unplug } from 'lucide-react';
+import { getPlant, updatePlant, deletePlant, mapPlantDevice, unmapPlantDevice } from '../../api/plants';
 import { ApiError } from '../../api/client';
+import { usePlants } from '../../context/PlantContext';
+import { useDevices } from '../../context/DeviceContext';
 import PageContainer from '../../components/ui/PageContainer';
 import PageTitle from '../../components/ui/PageTitle';
 import BackButton from '../../components/ui/BackButton';
@@ -22,8 +24,29 @@ export default function EditPlant() {
 
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [mapping, setMapping] = useState(false);
+  const [unmapping, setUnmapping] = useState(false);
+  const [selectedDeviceId, setSelectedDeviceId] = useState<number | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+
+  const { plants } = usePlants();
+  const { devices, loading: devicesLoading } = useDevices();
+
+  const mappedDeviceIds = useMemo(() => {
+    const ids = new Set<number>();
+    for (const p of plants) {
+      if (p.id !== plantId && p.device_id !== null) {
+        ids.add(p.device_id);
+      }
+    }
+    return ids;
+  }, [plants, plantId]);
+
+  const availableDevices = useMemo(
+    () => devices.filter((d) => !mappedDeviceIds.has(d.id)),
+    [devices, mappedDeviceIds],
+  );
 
   useEffect(() => {
     if (!plantId || isNaN(plantId)) {
@@ -97,6 +120,41 @@ export default function EditPlant() {
         err instanceof ApiError ? err.message : 'Failed to delete plant. Please try again.',
       );
       setDeleting(false);
+    }
+  };
+
+  const handleMap = async () => {
+    if (selectedDeviceId === null) return;
+    setMapping(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const updated = await mapPlantDevice(plantId, selectedDeviceId);
+      setPlant((prev) => (prev ? { ...updated, plant_type: prev.plant_type } : updated));
+      setSuccess('Device mapped successfully.');
+    } catch (err) {
+      setError(
+        err instanceof ApiError ? err.message : 'Failed to map device. Please try again.',
+      );
+    } finally {
+      setMapping(false);
+    }
+  };
+
+  const handleUnmap = async () => {
+    setUnmapping(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      await unmapPlantDevice(plantId);
+      setPlant((prev) => (prev ? { ...prev, device_id: null, device: null } : prev));
+      setSuccess('Device unmapped successfully.');
+    } catch (err) {
+      setError(
+        err instanceof ApiError ? err.message : 'Failed to unmap device. Please try again.',
+      );
+    } finally {
+      setUnmapping(false);
     }
   };
 
@@ -260,6 +318,98 @@ export default function EditPlant() {
             )}
           </button>
         </form>
+      </div>
+
+      <div className="bg-beige-50 rounded-2xl border border-beige-300 p-8 shadow-sm mb-6">
+        <h2 className="font-serif text-xl text-forest-800 mb-6">Device Connection</h2>
+        {plant.device ? (
+          <>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-forest-DEFAULT/10 flex items-center justify-center">
+                <Cpu className="w-5 h-5 text-forest-DEFAULT" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-forest-700">{plant.device.name}</p>
+                <p className="text-xs text-forest-400">Device ID: {plant.device.id}</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleUnmap}
+              disabled={unmapping}
+              className="inline-flex items-center gap-2 border border-red-300 text-red-600 font-medium px-5 py-2.5 rounded-full hover:bg-red-50 hover:border-red-400 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed text-sm"
+            >
+              {unmapping ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Unmapping...
+                </>
+              ) : (
+                <>
+                  <Unplug className="w-4 h-4" />
+                  Unmap Device
+                </>
+              )}
+            </button>
+          </>
+        ) : (
+          <>
+            <div className="space-y-4">
+              <div>
+                <label
+                  htmlFor="plant-device"
+                  className="block text-sm font-medium text-forest-700 mb-1.5"
+                >
+                  Select Device
+                </label>
+                <select
+                  id="plant-device"
+                  value={selectedDeviceId ?? ''}
+                  onChange={(e) => setSelectedDeviceId(e.target.value ? Number(e.target.value) : null)}
+                  disabled={devicesLoading || mapping}
+                  className="w-full px-4 py-3 rounded-xl border border-beige-300 bg-white text-forest-700 focus:outline-none focus:border-forest-300 focus:ring-2 focus:ring-forest-DEFAULT/20 transition-all text-sm disabled:opacity-50"
+                >
+                  <option value="">{devicesLoading ? 'Loading devices...' : '-- Choose a device --'}</option>
+                  {availableDevices.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.name} (ID: {d.id})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <button
+                type="button"
+                onClick={handleMap}
+                disabled={selectedDeviceId === null || mapping}
+                className="inline-flex items-center gap-2 bg-forest-DEFAULT text-beige-100 font-semibold px-5 py-2.5 rounded-full transition-all duration-300 hover:shadow-xl hover:shadow-forest-DEFAULT/25 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed text-sm"
+              >
+                {mapping ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Mapping...
+                  </>
+                ) : (
+                  'Map Device'
+                )}
+              </button>
+            </div>
+            <div className="mt-5 pt-5 border-t border-beige-200">
+              <p className="text-xs text-forest-400 leading-relaxed mb-3">
+                Only devices that are not already mapped to a plant are shown. If the device
+                you're looking for doesn't appear here, it may already be connected to another
+                plant, or you haven't set one up yet.
+              </p>
+              <button
+                type="button"
+                onClick={() => navigate('/devices/add')}
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-forest-DEFAULT hover:text-forest-700 transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                Set up a new device
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="bg-beige-50 rounded-2xl border border-red-200 p-8 shadow-sm">
