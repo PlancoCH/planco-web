@@ -26,8 +26,8 @@ function blobToDataUrl(blob: Blob): Promise<string> {
   });
 }
 
-export async function fetchImageAsDataUrl(url: string, fetchHeaders: HeadersInit): Promise<string> {
-  const response = await fetch(url, { headers: fetchHeaders });
+export async function fetchImageAsDataUrl(url: string, fetchHeaders: HeadersInit, signal?: AbortSignal): Promise<string> {
+  const response = await fetch(url, { headers: fetchHeaders, signal });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
   const contentType = response.headers.get('Content-Type') || '';
@@ -65,29 +65,9 @@ export function useAuthImage(url: string, fetchHeaders?: HeadersInit): { dataUrl
     setDataUrl(null);
     setLoading(true);
 
-    fetch(url, { headers: fetchHeaders, signal: controller.signal })
-      .then(async (res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const contentType = res.headers.get('Content-Type') || '';
-
-        if (contentType.startsWith('image/')) {
-          const blob = await res.blob();
-          if (cancelled) return;
-          return blobToDataUrl(blob);
-        }
-
-        const text = await res.text();
-        if (cancelled) return;
-
-        if (text.startsWith('data:image/')) return text;
-
-        const mime = detectImageMime(text);
-        if (mime) return `data:${mime};base64,${text.trimStart()}`;
-
-        throw new Error(`Unrecognised image format (Content-Type: ${contentType})`);
-      })
+    fetchImageAsDataUrl(url, fetchHeaders, controller.signal)
       .then((result) => {
-        if (!cancelled && result) {
+        if (!cancelled) {
           setDataUrl(result);
           setLoading(false);
         }

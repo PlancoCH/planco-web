@@ -1,5 +1,4 @@
 import type { ComponentType } from 'react';
-import { useAuthImage } from '../../hooks/useAuthImage';
 
 type Icon = ComponentType<{ className?: string }>;
 
@@ -13,7 +12,6 @@ interface ImageCardProps {
   tags?: string[];
   reverse?: boolean;
   onClick?: () => void;
-  fetchHeaders?: HeadersInit;
 }
 
 export default function ImageCard({
@@ -26,13 +24,9 @@ export default function ImageCard({
   tags,
   reverse = false,
   onClick,
-  fetchHeaders,
 }: ImageCardProps) {
   const isHorizontal = variant === 'horizontal';
   const isClickable = onClick !== undefined;
-
-  const { dataUrl } = useAuthImage(image, fetchHeaders);
-  const imageSrc = dataUrl ?? image;
 
   return (
     <div
@@ -56,7 +50,7 @@ export default function ImageCard({
         }`}
       >
         <img
-          src={imageSrc}
+          src={image}
           alt={imageAlt}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />

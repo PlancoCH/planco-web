@@ -7,7 +7,7 @@ import type { SearchConfig, PaginationConfig, EmptyStateConfig } from '../compon
 import ImageCard from '../components/ui/ImageCard';
 import type { Plant } from '../types/plant';
 import { usePlants } from '../context/PlantContext';
-import { getToken } from '../api/client';
+import { useImageCache } from '../context/ImageCacheContext';
 
 const searchConfig: SearchConfig<Plant> = {
   placeholder: 'Search plants...',
@@ -23,8 +23,8 @@ const paginationConfig: PaginationConfig = {
 };
 
 export default function Plants() {
-  const { plants, loading, refresh, imageCache } = usePlants();
-  const token = getToken();
+  const { plants, loading, refresh } = usePlants();
+  const { getImageUrl } = useImageCache();
 
   useEffect(() => {
     refresh();
@@ -57,14 +57,11 @@ export default function Plants() {
           search={searchConfig}
           pagination={paginationConfig}
           emptyState={emptyState}
-          renderItem={(plant) => {
-            const cachedImage = imageCache[plant.id];
-            const imageUrl = `https://api.planco.ch/api/plants/${plant.id}/image`;
-            return (
+          renderItem={(plant) => (
             <ImageCard
               variant="vertical"
               icon={Sprout}
-              image={cachedImage ?? imageUrl}
+              image={getImageUrl('plant', plant.id) ?? `https://api.planco.ch/api/plants/${plant.id}/image`}
               imageAlt={plant.nickname}
               title={plant.nickname}
               paragraph={
@@ -76,10 +73,8 @@ export default function Plants() {
                 plant.role === 'owner' ? 'Owner' : 'Member',
                 plant.device ? `Connected to ${plant.device.name}` : 'No device',
               ]}
-              fetchHeaders={cachedImage ? undefined : token ? { Authorization: `Bearer ${token}` } : undefined}
             />
-            );
-          }}
+          )}
         />
       )}
     </PageContainer>
