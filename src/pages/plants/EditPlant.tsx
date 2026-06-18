@@ -118,7 +118,7 @@ export default function EditPlant() {
       <PageContainer>
         <PageTitle title="Plant Not Found" subtitle="The plant you're looking for doesn't exist or you don't have access." />
         <div className="flex justify-center">
-          <BackButton to="/plants" text="Back to Plants" />
+          <BackButton text="Back to Plant" />
         </div>
       </PageContainer>
     );
@@ -126,7 +126,7 @@ export default function EditPlant() {
 
   return (
     <PageContainer>
-      <BackButton to="/plants" text="Back to Plants" />
+      <BackButton text="Back to Plant" />
 
       <PageTitle title={plant.nickname} subtitle="View and edit plant settings." />
 
