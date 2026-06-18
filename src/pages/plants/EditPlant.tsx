@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo, type FormEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Loader2, Trash2, Cpu, Plus, Unplug } from 'lucide-react';
+import { Loader2, Trash2, Cpu, Plus, Unplug, Upload, ImageIcon } from 'lucide-react';
 import { getPlant, updatePlant, deletePlant, mapPlantDevice, unmapPlantDevice } from '../../api/plants';
 import { ApiError } from '../../api/client';
 import { usePlants } from '../../context/PlantContext';
 import { useDevices } from '../../context/DeviceContext';
+import { useImageCache } from '../../context/ImageCacheContext';
 import PageContainer from '../../components/ui/PageContainer';
 import PageTitle from '../../components/ui/PageTitle';
 import BackButton from '../../components/ui/BackButton';
@@ -30,8 +31,13 @@ export default function EditPlant() {
   const [success, setSuccess] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
+  const [customImageDataUrl, setCustomImageDataUrl] = useState<string | null>(null);
+  const [imageFileName, setImageFileName] = useState<string | null>(null);
+  const [removingImage, setRemovingImage] = useState(false);
+
   const { plants } = usePlants();
   const { devices, loading: devicesLoading } = useDevices();
+  const { getImageUrl } = useImageCache();
 
   const mappedDeviceIds = useMemo(() => {
     const ids = new Set<number>();
@@ -86,11 +92,15 @@ export default function EditPlant() {
     const payload: PlantUpdatePayload = {
       nickname,
       notes: notes || null,
+      custom_image: customImageDataUrl || undefined,
     };
 
     try {
       const updated = await updatePlant(plantId, payload);
       setPlant((prev) => (prev ? { ...updated, plant_type: prev.plant_type, device: prev.device } : updated));
+      localStorage.removeItem('image_cache');
+      setCustomImageDataUrl(null);
+      setImageFileName(null);
       setSuccess('Plant updated successfully.');
     } catch (err) {
       if (err instanceof ApiError) {
@@ -155,6 +165,49 @@ export default function EditPlant() {
       );
     } finally {
       setUnmapping(false);
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setError('Please choose an image file');
+      e.target.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCustomImageDataUrl(String(reader.result));
+      setImageFileName(file.name);
+      setError(null);
+    };
+    reader.onerror = () => {
+      setError('Failed to load image');
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const handleRemoveCustomImage = async () => {
+    setRemovingImage(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const updated = await updatePlant(plantId, { custom_image: null });
+      setPlant((prev) => (prev ? { ...updated, plant_type: prev.plant_type, device: prev.device } : updated));
+      localStorage.removeItem('image_cache');
+      setCustomImageDataUrl(null);
+      setImageFileName(null);
+      setSuccess('Custom image removed. Using standard plant image.');
+    } catch (err) {
+      setError(
+        err instanceof ApiError ? err.message : 'Failed to remove custom image.',
+      );
+    } finally {
+      setRemovingImage(false);
     }
   };
 
@@ -301,6 +354,66 @@ export default function EditPlant() {
             {fieldErrors.notes?.map((msg) => (
               <p key={msg} className="text-xs text-red-600 mt-1">{msg}</p>
             ))}
+          </div>
+
+          <div>
+            <p className="text-sm font-medium text-forest-700 mb-1.5">Plant Image</p>
+            <div className="flex flex-col sm:flex-row items-start gap-4">
+              <div className="w-32 h-32 rounded-xl border border-beige-300 bg-white overflow-hidden flex-shrink-0 flex items-center justify-center">
+                {customImageDataUrl ? (
+                  <img src={customImageDataUrl} alt="Preview" className="w-full h-full object-cover" />
+                ) : getImageUrl('plant', plantId) ? (
+                  <img
+                    src={getImageUrl('plant', plantId)!}
+                    alt="Current plant"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <ImageIcon className="w-8 h-8 text-beige-400" />
+                )}
+              </div>
+              <div className="flex flex-col gap-2 w-full sm:w-auto">
+                <label className="inline-flex items-center gap-2 cursor-pointer border border-beige-300 text-forest-600 font-medium px-4 py-2 rounded-full hover:bg-beige-100 transition-all duration-300 text-sm">
+                  <Upload className="w-4 h-4" />
+                  Choose Image
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                </label>
+                {imageFileName && (
+                  <p className="text-xs text-forest-500">
+                    New image: {imageFileName}
+                  </p>
+                )}
+                {plant.custom_image && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveCustomImage}
+                    disabled={removingImage}
+                    className="inline-flex items-center gap-2 border border-red-300 text-red-600 font-medium px-4 py-2 rounded-full hover:bg-red-50 hover:border-red-400 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed text-sm"
+                  >
+                    {removingImage ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Removing...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 className="w-4 h-4" />
+                        Remove Custom Image
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            </div>
+            <p className="text-xs text-forest-400 mt-2 leading-relaxed">
+              Supported formats: JPEG, PNG, GIF, WebP, BMP. The image will be sent when you save
+              changes.
+            </p>
           </div>
 
           <button

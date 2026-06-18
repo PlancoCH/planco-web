@@ -71,7 +71,7 @@ export interface PlantUpdatePayload {
   nickname?: string;
   notes?: string | null;
   plant_type_id?: number;
-  custom_image?: string;
+  custom_image?: string | null;
 }
 
 export interface PaginatedPlantTypes {
