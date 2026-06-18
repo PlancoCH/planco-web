@@ -33,6 +33,7 @@ export default function EditPlant() {
 
   const [customImageDataUrl, setCustomImageDataUrl] = useState<string | null>(null);
   const [imageFileName, setImageFileName] = useState<string | null>(null);
+  const [removingImage, setRemovingImage] = useState(false);
 
   const { plants } = usePlants();
   const { devices, loading: devicesLoading } = useDevices();
@@ -188,6 +189,26 @@ export default function EditPlant() {
     };
     reader.readAsDataURL(file);
     e.target.value = '';
+  };
+
+  const handleRemoveCustomImage = async () => {
+    setRemovingImage(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const updated = await updatePlant(plantId, { custom_image: null });
+      setPlant((prev) => (prev ? { ...updated, plant_type: prev.plant_type, device: prev.device } : updated));
+      localStorage.removeItem('image_cache');
+      setCustomImageDataUrl(null);
+      setImageFileName(null);
+      setSuccess('Custom image removed. Using standard plant image.');
+    } catch (err) {
+      setError(
+        err instanceof ApiError ? err.message : 'Failed to remove custom image.',
+      );
+    } finally {
+      setRemovingImage(false);
+    }
   };
 
   if (loading) {
@@ -366,6 +387,26 @@ export default function EditPlant() {
                   <p className="text-xs text-forest-500">
                     New image: {imageFileName}
                   </p>
+                )}
+                {plant.custom_image && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveCustomImage}
+                    disabled={removingImage}
+                    className="inline-flex items-center gap-2 border border-red-300 text-red-600 font-medium px-4 py-2 rounded-full hover:bg-red-50 hover:border-red-400 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed text-sm"
+                  >
+                    {removingImage ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Removing...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 className="w-4 h-4" />
+                        Remove Custom Image
+                      </>
+                    )}
+                  </button>
                 )}
               </div>
             </div>
