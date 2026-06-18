@@ -7,13 +7,7 @@ import type { SearchConfig, PaginationConfig, EmptyStateConfig } from '../compon
 import ImageCard from '../components/ui/ImageCard';
 import type { Plant } from '../types/plant';
 import { usePlants } from '../context/PlantContext';
-
-const PLANT_IMAGE_FALLBACK = 'data:image/svg+xml,' + encodeURIComponent(
-  '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">' +
-  '<rect fill="#F2EAD8" width="400" height="300"/>' +
-  '<text fill="#7FA87A" font-family="sans-serif" font-size="48" x="200" y="160" text-anchor="middle">🪴</text>' +
-  '</svg>'
-);
+import { getToken } from '../api/client';
 
 const searchConfig: SearchConfig<Plant> = {
   placeholder: 'Search plants...',
@@ -30,6 +24,7 @@ const paginationConfig: PaginationConfig = {
 
 export default function Plants() {
   const { plants, loading, refresh } = usePlants();
+  const token = getToken();
 
   useEffect(() => {
     refresh();
@@ -66,7 +61,7 @@ export default function Plants() {
             <ImageCard
               variant="vertical"
               icon={Sprout}
-              image={PLANT_IMAGE_FALLBACK}
+              image={"https://api.planco.ch/api/plants/" + plant.id + "/image"}
               imageAlt={plant.nickname}
               title={plant.nickname}
               paragraph={
@@ -78,6 +73,7 @@ export default function Plants() {
                 plant.role === 'owner' ? 'Owner' : 'Member',
                 plant.device ? `Connected to ${plant.device.name}` : 'No device',
               ]}
+              fetchHeaders={token ? { Authorization: `Bearer ${token}` } : undefined}
             />
           )}
         />

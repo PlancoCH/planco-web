@@ -53,5 +53,5 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   return data as T;
 }
 
-export { request, ApiError, BASE_URL };
+export { request, getToken, ApiError, BASE_URL };
 export type { RequestInit };
