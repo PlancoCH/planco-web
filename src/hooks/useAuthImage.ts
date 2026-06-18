@@ -1,4 +1,21 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
+
+const BASE64_MAGIC: [string, string][] = [
+  ['/9j/', 'image/jpeg'],
+  ['iVBORw0KGgo', 'image/png'],
+  ['R0lGOD', 'image/gif'],
+  ['UklGR', 'image/webp'],
+  ['Qk', 'image/bmp'],
+  ['PHN2Zy', 'image/svg+xml'],
+];
+
+function detectImageMime(base64: string): string | null {
+  const trimmed = base64.trimStart();
+  for (const [magic, mime] of BASE64_MAGIC) {
+    if (trimmed.startsWith(magic)) return mime;
+  }
+  return null;
+}
 
 function blobToDataUrl(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -11,10 +28,9 @@ function blobToDataUrl(blob: Blob): Promise<string> {
 
 export function useAuthImage(url: string, fetchHeaders?: HeadersInit): { dataUrl: string | null; loading: boolean } {
   const [dataUrl, setDataUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(!!fetchHeaders);
-  const prevHeadersRef = useRef<string | undefined>();
+  const [loading, setLoading] = useState(false);
 
-  const headersKey = fetchHeaders ? JSON.stringify(fetchHeaders) : undefined;
+  const headersKey = fetchHeaders ? JSON.stringify(fetchHeaders) : '';
 
   useEffect(() => {
     if (!fetchHeaders) {
@@ -25,27 +41,39 @@ export function useAuthImage(url: string, fetchHeaders?: HeadersInit): { dataUrl
 
     let cancelled = false;
     const controller = new AbortController();
-
-    if (headersKey !== prevHeadersRef.current) {
-      setDataUrl(null);
-      setLoading(true);
-    }
-    prevHeadersRef.current = headersKey;
+    setDataUrl(null);
+    setLoading(true);
 
     fetch(url, { headers: fetchHeaders, signal: controller.signal })
-      .then((res) => {
+      .then(async (res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.blob();
+        const contentType = res.headers.get('Content-Type') || '';
+
+        if (contentType.startsWith('image/')) {
+          const blob = await res.blob();
+          if (cancelled) return;
+          return blobToDataUrl(blob);
+        }
+
+        const text = await res.text();
+        if (cancelled) return;
+
+        if (text.startsWith('data:image/')) return text;
+
+        const mime = detectImageMime(text);
+        if (mime) return `data:${mime};base64,${text.trimStart()}`;
+
+        throw new Error(`Unrecognised image format (Content-Type: ${contentType})`);
       })
-      .then((blob) => blobToDataUrl(blob))
-      .then((url) => {
-        if (!cancelled) {
-          setDataUrl(url);
+      .then((result) => {
+        if (!cancelled && result) {
+          setDataUrl(result);
           setLoading(false);
         }
       })
-      .catch(() => {
+      .catch((err) => {
         if (!cancelled) {
+          console.warn(`useAuthImage: failed to load ${url}`, err);
           setDataUrl(null);
           setLoading(false);
         }
@@ -55,7 +83,7 @@ export function useAuthImage(url: string, fetchHeaders?: HeadersInit): { dataUrl
       cancelled = true;
       controller.abort();
     };
-  }, [url, headersKey, fetchHeaders]);
+  }, [url, headersKey]);
 
   return { dataUrl, loading };
 }
