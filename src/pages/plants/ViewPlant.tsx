@@ -207,18 +207,18 @@ export default function ViewPlant() {
 
         {/* Bottom text */}
         <div className="absolute bottom-0 left-0 right-0 p-4 sm:px-6 pb-8 md:pb-10">
-          <h1 className="font-serif text-3xl md:text-4xl text-white mb-3 drop-shadow-sm">
+          <h1 className="font-serif text-3xl md:text-4xl text-white mb-3 drop-shadow-sm text-shadow-lg">
             {plant.nickname}
           </h1>
-          <p className="text-white/80 text-sm md:text-base max-w-xl leading-relaxed">
+          <p className="text-white/80 text-sm md:text-base max-w-xl leading-relaxed text-shadow-lg">
             {plant.notes ??
               `A ${plant.plant_type.common_name} (${plant.plant_type.scientific_name})`}
           </p>
           <div className="flex flex-wrap gap-2 mt-4">
-            <span className="text-xs font-medium text-white/90 bg-white/15 backdrop-blur-sm px-3 py-1 rounded-full border border-white/20">
+            <span className="text-xs font-medium text-FOREST/90 bg-white/15 backdrop-blur-sm px-3 py-1 rounded-full border border-white/20 shadow-sm">
               {plant.role === "owner" ? "Owner" : "Member"}
             </span>
-            <span className="text-xs font-medium text-white/90 bg-white/15 backdrop-blur-sm px-3 py-1 rounded-full border border-white/20">
+            <span className="text-xs font-medium text-FOREST/90 bg-white/15 backdrop-blur-sm px-3 py-1 rounded-full border border-white/20 shadow-sm">
               {plant.device
                 ? `Connected to ${plant.device.name}`
                 : "No device connected"}
