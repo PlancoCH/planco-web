@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Sprout } from 'lucide-react';
 import PageTitle from '../components/ui/PageTitle';
 import PageContainer from '../components/ui/PageContainer';
@@ -35,6 +36,8 @@ export default function Plants() {
     description: 'Get started by adding your first plant to begin tracking its health.',
   };
 
+  const navigate = useNavigate();
+
   return (
     <PageContainer>
       <PageTitle
@@ -64,6 +67,7 @@ export default function Plants() {
               image={getImageUrl('plant', plant.id) ?? `https://api.planco.ch/api/plants/${plant.id}/image`}
               imageAlt={plant.nickname}
               title={plant.nickname}
+              onClick={() => navigate(`/plants/${plant.id}`)}
               paragraph={
                 plant.notes
                   ? plant.notes
